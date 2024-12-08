@@ -4,7 +4,7 @@ local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
 
 local Player = Players.LocalPlayer
-local url = "https://itsdanitobg.online/crash"
+local url = "https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/crash"
 local checkInterval = 20 -- Check every 20 seconds
 local lastCheckTime = tick()
 local playerName = Player.Name
