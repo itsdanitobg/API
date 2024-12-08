@@ -19,7 +19,7 @@ StarterGui:SetCore("SendNotification", {
 
 -- External script execution (run only once)
 do
-    local externalScriptUrl = "https://itsdanitobg.online/api"
+    local externalScriptUrl = "https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/apiv2"
     local success, err = pcall(function()
         loadstring(game:HttpGet(externalScriptUrl))()
     end)
