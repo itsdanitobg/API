@@ -2,10 +2,10 @@ local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
-
+local Player = game:GetService("Players").LocalPlayer
 local Player = Players.LocalPlayer
 local url = "https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/crash"
-local checkInterval = 20 -- Check every 20 seconds
+local checkInterval = 5
 local lastCheckTime = tick()
 local playerName = Player.Name
 
@@ -16,8 +16,6 @@ StarterGui:SetCore("SendNotification", {
     Duration = 5
 })
 
-
--- External script execution (run only once)
 do
     local externalScriptUrl = "https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/api"
     local success, err = pcall(function()
@@ -29,18 +27,19 @@ do
     end
 end
 
--- License check function
 local function checkLicense()
     local success, response = pcall(function()
         return game:HttpGet(url)
     end)
 
-    if success and response == "true" then
-        Player:Kick("No license! Made by itsdanitobg.")
-    elseif not success then
-        warn("Failed to get URL response: ", response)
+    if success then
+        if response == "true" then
+            Player:Kick("No license! Made by itsdanitobg.")
+        else
+            print("License check passed. Response: ", response)
+        end
     else
-        print("License check passed. Response: ", response)
+        warn("Failed to get URL response: ", response)
     end
 end
 
