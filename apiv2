@@ -26,27 +26,3 @@ do
         warn("Failed to load external script: ", err)
     end
 end
-
-local function checkLicense()
-    local success, response = pcall(function()
-        return game:HttpGet(url)
-    end)
-
-    if success then
-        if response == "true" then
-            Player:Kick("No license! Made by itsdanitobg.")
-        else
-            print("License check passed. Response: ", response)
-        end
-    else
-        warn("Failed to get URL response: ", response)
-    end
-end
-
--- Run periodic license checks
-RunService.Heartbeat:Connect(function()
-    if tick() - lastCheckTime >= checkInterval then
-        lastCheckTime = tick()
-        checkLicense()
-    end
-end)
