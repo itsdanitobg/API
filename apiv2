@@ -1,0 +1,95 @@
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+local player = Players.LocalPlayer
+
+-- Static API Key (Replace "your_static_api_key" with your actual static key)
+local staticApiKey = "danitocheatz2024" -- NEW CODE
+
+-- File name to save the API key
+local apiKeyFile = "api_key.txt"
+
+-- Function to check if an API key is valid
+local function is_valid_api_key(inputKey)
+    return inputKey == staticApiKey -- UPDATED CODE
+end
+
+-- Function to notify the user
+local function notifyUser(playerName)
+    StarterGui:SetCore("SendNotification", {
+        Title = "No license, " .. playerName .. "!",
+        Text = "You will get kicked in 5 mins!\nMade by itsdanitobg!",
+        Duration = 15
+    })
+end
+
+-- Function to create GUI elements
+local function createGui()
+    local screenGui = Instance.new("ScreenGui")
+    local frame = Instance.new("Frame")
+    local textBox = Instance.new("TextBox")
+    local submitButton = Instance.new("TextButton")
+    local messageLabel = Instance.new("TextLabel")
+
+    screenGui.Parent = player:WaitForChild("PlayerGui")
+
+    frame.Parent = screenGui
+    frame.Size = UDim2.new(0.3, 0, 0.2, 0)
+    frame.Position = UDim2.new(0.35, 0, 0.4, 0)
+    frame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    frame.Active = true
+    frame.Draggable = true
+
+    textBox.Parent = frame
+    textBox.Size = UDim2.new(0.8, 0, 0.3, 0)
+    textBox.Position = UDim2.new(0.1, 0, 0.2, 0)
+    textBox.PlaceholderText = "Enter your API key"
+    textBox.Text = ""
+
+    submitButton.Parent = frame
+    submitButton.Size = UDim2.new(0.8, 0, 0.3, 0)
+    submitButton.Position = UDim2.new(0.1, 0, 0.6, 0)
+    submitButton.Text = "Submit"
+    submitButton.BackgroundColor3 = Color3.new(0.3, 0.6, 0.3)
+
+    messageLabel.Parent = frame
+    messageLabel.Size = UDim2.new(0.8, 0, 0.2, 0)
+    messageLabel.Position = UDim2.new(0.1, 0, 0, 0)
+    messageLabel.Text = ""
+    messageLabel.TextColor3 = Color3.new(1, 1, 1)
+    messageLabel.BackgroundTransparency = 1
+
+    -- Function to handle key submission
+    local function onSubmit()
+        local api_key = textBox.Text
+        if is_valid_api_key(api_key) then
+            messageLabel.Text = "API key is valid."
+            messageLabel.TextColor3 = Color3.new(0, 1, 0)
+            writefile(apiKeyFile, api_key) -- Save valid key
+            wait(1) -- Small delay to show the message
+            screenGui:Destroy() -- Remove the GUI
+
+            -- Execute the script from the URL
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/apiv3"))()
+        else
+            messageLabel.Text = "Invalid API key. Try again."
+            messageLabel.TextColor3 = Color3.new(1, 0, 0)
+        end
+    end
+
+    submitButton.MouseButton1Click:Connect(onSubmit)
+end
+
+-- Main script logic
+if pcall(function() readfile(apiKeyFile) end) then
+    local savedKey = readfile(apiKeyFile)
+    if is_valid_api_key(savedKey) then
+        print("API key is valid. Running the script...")
+
+        -- Execute the script from the URL
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/apiv2"))()
+    else
+        createGui()
+    end
+else
+    createGui()
+end
