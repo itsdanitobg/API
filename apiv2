@@ -86,7 +86,7 @@ if pcall(function() readfile(apiKeyFile) end) then
         print("API key is valid. Running the script...")
 
         -- Execute the script from the URL
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/apiv2"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/apiv3"))()
     else
         createGui()
     end
