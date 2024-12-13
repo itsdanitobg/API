@@ -1,6 +1,5 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Neon-Fox/roblox-scripts/main/VynixuMM2"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/edgeiy/infiniteyield/master/source"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Ihaveash0rtnamefordiscord/Releases/main/MurderMystery2HighlightESP"))(' Watermelon ?')
-loadstring(game:HttpGet("https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/voidprotection"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/name%20esp"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/ctrl%20%2B%20click%20%3D%20tp"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/ctrl-click-tp-nameesp"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/void-protection))()
