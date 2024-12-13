@@ -1,0 +1,130 @@
+-- Roblox UI: Moveable UI with TAB toggle and display of 'running' state
+
+-- Create UI Elements
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local RunningLabel = Instance.new("TextLabel")
+local ToggleButton = Instance.new("TextButton")
+local Watermark = Instance.new("TextLabel")
+local TitleLabel = Instance.new("TextLabel")
+
+-- Properties
+ScreenGui.Name = "MoveableUI"
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+MainFrame.BorderSizePixel = 0
+MainFrame.Size = UDim2.new(0, 300, 0, 200)
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+TitleLabel.Name = "TitleLabel"
+TitleLabel.Parent = MainFrame
+TitleLabel.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+TitleLabel.BorderSizePixel = 0
+TitleLabel.Size = UDim2.new(1, -10, 0, 30)
+TitleLabel.Position = UDim2.new(0, 5, 0, 5)
+TitleLabel.Font = Enum.Font.SourceSansBold
+TitleLabel.Text = "Coins Farmer"
+TitleLabel.TextColor3 = Color3.new(1, 1, 1)
+TitleLabel.TextSize = 20
+
+RunningLabel.Name = "RunningLabel"
+RunningLabel.Parent = MainFrame
+RunningLabel.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+RunningLabel.BorderSizePixel = 0
+RunningLabel.Size = UDim2.new(1, -10, 0, 50)
+RunningLabel.Position = UDim2.new(0, 5, 0, 40)
+RunningLabel.Font = Enum.Font.SourceSans
+RunningLabel.Text = "Running: false"
+RunningLabel.TextColor3 = Color3.new(1, 1, 1)
+RunningLabel.TextSize = 24
+
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Parent = MainFrame
+ToggleButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+ToggleButton.BorderSizePixel = 0
+ToggleButton.Size = UDim2.new(1, -10, 0, 50)
+ToggleButton.Position = UDim2.new(0, 5, 0, 100)
+ToggleButton.Font = Enum.Font.SourceSans
+ToggleButton.Text = "Toggle Running"
+ToggleButton.TextColor3 = Color3.new(1, 1, 1)
+ToggleButton.TextSize = 24
+
+Watermark.Name = "Watermark"
+Watermark.Parent = MainFrame
+Watermark.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+Watermark.BorderSizePixel = 0
+Watermark.Size = UDim2.new(1, -10, 0, 30)
+Watermark.Position = UDim2.new(0, 5, 0, 160)
+Watermark.Font = Enum.Font.SourceSansItalic
+Watermark.Text = "Made by ItsDanitobg"
+Watermark.TextColor3 = Color3.new(1, 1, 1)
+Watermark.TextSize = 18
+
+-- UI Toggle Functionality
+local uiVisible = true
+game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Tab then
+        uiVisible = not uiVisible
+        MainFrame.Visible = uiVisible
+    end
+end)
+
+-- Update 'Running' State
+spawn(function()
+    while wait(0.1) do
+        RunningLabel.Text = "Running: " .. tostring(running)
+    end
+end)
+
+-- Toggle Button Functionality
+ToggleButton.MouseButton1Click:Connect(function()
+    running = not running
+    print("Running state toggled to:", running)
+end)
+
+-- Variables for Coin Farming
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local collectedCoins = 0
+
+-- Function to find all coins
+local function getAllCoins()
+    local coins = {}
+    for _, object in pairs(workspace:GetDescendants()) do
+        if object.Name == "Coin_Server" and object:IsA("BasePart") then
+            table.insert(coins, object)
+        end
+    end
+    return coins
+end
+
+-- Function to teleport to a coin
+local function teleportToCoin(coin)
+    if not humanoidRootPart or not coin then return end
+    humanoidRootPart.CFrame = coin.CFrame + Vector3.new(0, 3, 0)
+end
+
+-- Main Farming Loop
+spawn(function()
+    while wait(0.1) do
+        if running then
+            local coins = getAllCoins()
+            if #coins > 0 then
+                local targetCoin = coins[1]
+                teleportToCoin(targetCoin)
+                if targetCoin.Parent then
+                    collectedCoins = collectedCoins + 1
+                end
+            else
+                wait(0.5)
+            end
+        end
+    end
+end)
