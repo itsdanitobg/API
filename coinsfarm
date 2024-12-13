@@ -5,19 +5,21 @@ local ScreenGui = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
 local RunningLabel = Instance.new("TextLabel")
 local ToggleButton = Instance.new("TextButton")
+local TeleportButton = Instance.new("TextButton")
 local Watermark = Instance.new("TextLabel")
 local TitleLabel = Instance.new("TextLabel")
 
 -- Properties
 ScreenGui.Name = "MoveableUI"
+ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
 MainFrame.BorderSizePixel = 0
-MainFrame.Size = UDim2.new(0, 300, 0, 200)
-MainFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+MainFrame.Size = UDim2.new(0, 300, 0, 250)
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -125)
 MainFrame.Active = true
 MainFrame.Draggable = true
 
@@ -54,12 +56,23 @@ ToggleButton.Text = "Toggle Running"
 ToggleButton.TextColor3 = Color3.new(1, 1, 1)
 ToggleButton.TextSize = 24
 
+TeleportButton.Name = "TeleportButton"
+TeleportButton.Parent = MainFrame
+TeleportButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+TeleportButton.BorderSizePixel = 0
+TeleportButton.Size = UDim2.new(1, -10, 0, 50)
+TeleportButton.Position = UDim2.new(0, 5, 0, 160)
+TeleportButton.Font = Enum.Font.SourceSans
+TeleportButton.Text = "Teleport to GunDrop"
+TeleportButton.TextColor3 = Color3.new(1, 1, 1)
+TeleportButton.TextSize = 24
+
 Watermark.Name = "Watermark"
 Watermark.Parent = MainFrame
 Watermark.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
 Watermark.BorderSizePixel = 0
 Watermark.Size = UDim2.new(1, -10, 0, 30)
-Watermark.Position = UDim2.new(0, 5, 0, 160)
+Watermark.Position = UDim2.new(0, 5, 0, 220)
 Watermark.Font = Enum.Font.SourceSansItalic
 Watermark.Text = "Made by ItsDanitobg"
 Watermark.TextColor3 = Color3.new(1, 1, 1)
@@ -75,6 +88,13 @@ game:GetService("UserInputService").InputBegan:Connect(function(input, gameProce
     end
 end)
 
+-- Variables for Coin Farming
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local running = false
+local collectedCoins = 0
+
 -- Update 'Running' State
 spawn(function()
     while wait(0.1) do
@@ -88,11 +108,31 @@ ToggleButton.MouseButton1Click:Connect(function()
     print("Running state toggled to:", running)
 end)
 
--- Variables for Coin Farming
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-local collectedCoins = 0
+-- Teleport to GunDrop Button Functionality
+TeleportButton.MouseButton1Click:Connect(function()
+    local oldPosition = humanoidRootPart.CFrame -- Save the player's current position
+    local nearestGunDrop = nil
+    local shortestDistance = math.huge
+
+    -- Find the nearest GunDrop
+    for _, object in pairs(workspace:GetDescendants()) do
+        if object.Name == "GunDrop" and object:IsA("BasePart") then
+            local distance = (object.Position - humanoidRootPart.Position).Magnitude
+            if distance < shortestDistance then
+                shortestDistance = distance
+                nearestGunDrop = object
+            end
+        end
+    end
+
+    if nearestGunDrop then
+        humanoidRootPart.CFrame = nearestGunDrop.CFrame + Vector3.new(0, 3, 0) -- Teleport to the GunDrop
+        task.wait(0.1) -- Shorter delay
+        humanoidRootPart.CFrame = oldPosition -- Teleport back to the old position
+    else
+        print("GunDrop not found!")
+    end
+end)
 
 -- Function to find all coins
 local function getAllCoins()
@@ -113,18 +153,23 @@ end
 
 -- Main Farming Loop
 spawn(function()
-    while wait(0.1) do
+    while wait(0.05) do -- Faster loop
         if running then
             local coins = getAllCoins()
             if #coins > 0 then
-                local targetCoin = coins[1]
+                local targetCoin = coins[1] -- Prioritize the first coin
                 teleportToCoin(targetCoin)
                 if targetCoin.Parent then
                     collectedCoins = collectedCoins + 1
                 end
-            else
-                wait(0.5)
             end
         end
     end
+end)
+
+-- Rebind to character and fix UI after respawn
+player.CharacterAdded:Connect(function(newCharacter)
+    character = newCharacter
+    humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    print("Player respawned, UI and connections reset.")
 end)
