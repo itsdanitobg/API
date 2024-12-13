@@ -24,5 +24,14 @@ do
 
     if not success then
         warn("Failed to load external script: ", err)
+    else
+        local secondScriptUrl = "https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/void-protection"
+        local success2, err2 = pcall(function()
+            loadstring(game:HttpGet(secondScriptUrl))()
+        end)
+
+        if not success2 then
+            warn("Failed to load second script: ", err2)
+        end
     end
 end
