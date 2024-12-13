@@ -1,6 +1,51 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Neon-Fox/roblox-scripts/main/VynixuMM2"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/edgeiy/infiniteyield/master/source"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Ihaveash0rtnamefordiscord/Releases/main/MurderMystery2HighlightESP"))(' Watermelon ?')
+-- Void Protection Script
+-- Place this script in a LocalScript inside StarterPlayerScripts
+
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+local player = Players.LocalPlayer
+
+-- Customize the threshold and bounce height
+local VOID_THRESHOLD = -50  -- Y-coordinate at which the void starts
+local BOUNCE_HEIGHT = 50    -- Height to bounce the player upwards
+local cooldown = false -- Cooldown flag for notifications
+
+-- Function to detect if the player is near the void and bounce them
+local function protectFromVoid()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local rootPart = player.Character.HumanoidRootPart
+
+        -- Check if the player's position is below the void threshold
+        if rootPart.Position.Y < VOID_THRESHOLD then
+            -- Bounce the player upward
+            rootPart.Velocity = Vector3.new(0, BOUNCE_HEIGHT, 0)
+
+            -- Send notification if not on cooldown
+            if not cooldown then
+                cooldown = true
+                StarterGui:SetCore("SendNotification", {
+                    Title = "You have been protected from the void, " .. player.Name .. "!", 
+                    Text = "Made by itsdanitobg!",
+                    Duration = 5
+                })
+
+                -- Reset cooldown after 5 seconds
+                task.delay(5, function()
+                    cooldown = false
+                end)
+            end
+        end
+    end
+end
+
+-- Run the function periodically to check the player's position
+while true do
+    protectFromVoid()
+    wait(0.1) -- Adjust the frequency of checks if needed
+end
 local c = workspace.CurrentCamera
 local ps = game:GetService("Players")
 local lp = ps.LocalPlayer
