@@ -1,0 +1,87 @@
+-- > Declarations < --
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LP = Players.LocalPlayer
+local roles
+local Murderer -- This will store the Murderer's name
+local teleportDistance = 10 -- Distance behind the murderer to teleport
+local flingForce = 1000 -- Force to apply to fling the murderer
+local teleportDelay = 0.1 -- Delay between teleports (faster for spamming)
+local flingCooldown = 0.1 -- Delay between flings to prevent excessive force spam
+local isFlung = false -- Flag to prevent multiple flings within short time
+
+-- > Functions < --
+
+function IsAlive(Player) -- Checks if a player is alive
+	for i, v in pairs(roles) do
+		if Player.Name == i then
+			if not v.Killed and not v.Dead then
+				return true
+			else
+				return false
+			end
+		end
+	end
+end
+
+function GetMurderer() -- Get the Murderer's character
+	for i, v in pairs(roles) do
+		if v.Role == "Murderer" then
+			return i
+		end
+	end
+	return nil
+end
+
+function TeleportBehindMurderer(murdererCharacter) -- Teleport behind the murderer
+	if murdererCharacter and murdererCharacter:FindFirstChild("HumanoidRootPart") then
+		local humanoidRootPart = murdererCharacter:FindFirstChild("HumanoidRootPart")
+		local direction = humanoidRootPart.CFrame.LookVector * -teleportDistance
+		LP.Character.HumanoidRootPart.CFrame = humanoidRootPart.CFrame + direction
+	end
+end
+
+function FlingMurderer(murdererCharacter) -- Apply force to fling the murderer
+	if murdererCharacter and murdererCharacter:FindFirstChild("Humanoid") then
+		local humanoid = murdererCharacter:FindFirstChild("Humanoid")
+		
+		-- Apply a fling force by creating a BodyVelocity
+		local bodyVelocity = Instance.new("BodyVelocity")
+		bodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000) -- High force to fling
+		bodyVelocity.Velocity = Vector3.new(math.random(-flingForce, flingForce), math.random(flingForce, flingForce), math.random(-flingForce, flingForce))
+		bodyVelocity.Parent = murdererCharacter.HumanoidRootPart
+		
+		-- Destroy the BodyVelocity after a short time to stop the force
+		game.Debris:AddItem(bodyVelocity, 0.2) -- Remove after 0.2 seconds to prevent continuous force application
+	end
+end
+
+-- > Loops < --
+
+RunService.RenderStepped:connect(function()
+	roles = ReplicatedStorage:FindFirstChild("GetPlayerData", true):InvokeServer()
+	
+	-- Find the murderer
+	Murderer = GetMurderer()
+	
+	if Murderer then
+		local murdererCharacter = Players[Murderer] and Players[Murderer].Character
+		
+		-- Make sure the murderer exists and is alive
+		if murdererCharacter and IsAlive(Players[Murderer]) then
+			-- Continuously teleport and fling the murderer
+			TeleportBehindMurderer(murdererCharacter) -- Teleport behind the murderer
+			wait(teleportDelay) -- Delay to prevent instant teleport spamming
+			
+			-- Apply fling only if the cooldown has passed
+			if not isFlung then
+				FlingMurderer(murdererCharacter) -- Fling the murderer
+				isFlung = true
+				wait(flingCooldown) -- Cooldown before the next fling
+				isFlung = false
+			end
+		end
+	end
+end)
