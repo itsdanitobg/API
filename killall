@@ -1,57 +1,36 @@
 -- > Declarations < --
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local LP = Players.LocalPlayer
-local maxDistance = 500 -- Maximum range for teleporting behind players
-local stopScript = false -- Flag to stop the script if needed
+local teleportRange = 500 -- Range to check for players within 500 meters
+local teleportDelay = 0.1 -- Delay between teleports (adjust for speed)
+local duration = 5 -- Duration to run the script (in seconds)
+local startTime = tick() -- Get the current time when the script starts
 
 -- > Functions < --
 
-function TeleportBehindPlayer(player)
-    -- Check if the player has a valid character and HumanoidRootPart
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local target = player.Character.HumanoidRootPart
-        local myHumanoidRootPart = LP.Character.HumanoidRootPart
-        
-        -- Calculate the direction to teleport behind the player
-        local direction = (myHumanoidRootPart.Position - target.Position).unit -- Get the vector pointing behind
-        local newPos = target.Position + direction * 5 -- Move 5 studs behind the player
+function IsInRange(player) -- Checks if the player is within the 500-meter range
+    local distance = (LP.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+    return distance <= teleportRange
+end
 
-        -- Teleport the player behind
-        LP.Character.HumanoidRootPart.CFrame = CFrame.new(newPos)
+function TeleportToPlayer(targetPlayer) -- Teleports to a target player
+    if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local targetPosition = targetPlayer.Character.HumanoidRootPart.Position
+        LP.Character.HumanoidRootPart.CFrame = CFrame.new(targetPosition)
     end
 end
 
 -- > Main Loop < --
 
-RunService.RenderStepped:connect(function()
-    -- If the stop flag is true, exit the loop and stop the script
-    if stopScript then
-        return
-    end
-    
-    -- Loop through all players
-    for _, player in pairs(Players:GetChildren()) do
-        -- Skip if the player is the LocalPlayer or if the player is dead
+while tick() - startTime < duration do -- Run the loop for 5 seconds
+    for _, player in pairs(Players:GetPlayers()) do
         if player ~= LP and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            local distance = (LP.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
-            
-            -- If the player is within range (500 meters), teleport behind them
-            if distance <= maxDistance then
-                TeleportBehindPlayer(player)
+            if IsInRange(player) then
+                TeleportToPlayer(player) -- Teleport to the player
+                wait(teleportDelay) -- Delay between teleports to avoid spamming
             end
         end
     end
-end)
-
--- > Stop the Script < --
-
--- Example condition to stop the script (e.g., when a player leaves the game)
-Players.PlayerRemoving:Connect(function(player)
-    -- Stop if the player being removed is the murderer or any other condition you want
-    if player == LP then
-        stopScript = true
-    end
-end)
+    wait(1) -- Wait a second before checking again
+end
