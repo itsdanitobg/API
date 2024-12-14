@@ -75,7 +75,6 @@ local function createGui()
             messageLabel.TextColor3 = Color3.new(1, 0, 0)
         end
     end
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Ihaveash0rtnamefordiscord/Releases/main/MurderMystery2HighlightESP"))(' Watermelon ?')
     submitButton.MouseButton1Click:Connect(onSubmit)
 end
 -- Main script logic
@@ -85,6 +84,7 @@ if pcall(function() readfile(apiKeyFile) end) then
         print("API key is valid. Running the script...")
 
         -- Execute the script from the URL
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Ihaveash0rtnamefordiscord/Releases/main/MurderMystery2HighlightESP"))(' Watermelon ?')
         loadstring(game:HttpGet("https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/apiv3"))()
     else
         createGui()
