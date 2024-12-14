@@ -183,6 +183,39 @@ TeleportButton.MouseButton1Click:Connect(function()
     end
 end)
 
+-- Function to find all coins
+local function getAllCoins()
+    local coins = {}
+    for _, object in pairs(workspace:GetDescendants()) do
+        if object.Name == "Coin_Server" and object:IsA("BasePart") then
+            table.insert(coins, object)
+        end
+    end
+    return coins
+end
+
+-- Function to teleport to a coin
+local function teleportToCoin(coin)
+    if not humanoidRootPart or not coin then return end
+    humanoidRootPart.CFrame = coin.CFrame + Vector3.new(0, 3, 0)
+end
+
+-- Main Farming Loop
+spawn(function()
+    while wait(0.05) do -- Faster loop
+        if running then
+            local coins = getAllCoins()
+            if #coins > 0 then
+                local targetCoin = coins[1] -- Prioritize the first coin
+                teleportToCoin(targetCoin)
+                if targetCoin.Parent then
+                    collectedCoins = collectedCoins + 1
+                end
+            end
+        end
+    end
+end)
+
 -- KillAll Button Functionality
 KillAllButton.MouseButton1Click:Connect(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/killall"))()
