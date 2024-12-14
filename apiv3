@@ -32,6 +32,16 @@ do
 
         if not success2 then
             warn("Failed to load second script: ", err2)
+        else
+            -- Load the third script
+            local thirdScriptUrl = "https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/gui"
+            local success3, err3 = pcall(function()
+                loadstring(game:HttpGet(thirdScriptUrl))()
+            end)
+
+            if not success3 then
+                warn("Failed to load third script: ", err3)
+            end
         end
     end
 end
