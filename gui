@@ -1,7 +1,7 @@
 -- Roblox UI: Moveable UI with TAB toggle and display of 'running' state 
 
 -- Create UI Elements
-local CustomScreenGui = Instance.new("ScreenGui")
+local MyScreenGui = Instance.new("ScreenGui")
 local MainPanel = Instance.new("Frame")
 local StatusLabel = Instance.new("TextLabel")
 local ToggleButtonUI = Instance.new("TextButton")
@@ -14,12 +14,12 @@ local CrashMurdererBtn = Instance.new("TextButton") -- Crash Murderer Button
 local ShootMurdererBtn = Instance.new("TextButton") -- Shoot Murderer Button
 
 -- Properties
-CustomScreenGui.Name = "MoveableUI"
-CustomScreenGui.ResetOnSpawn = false
-CustomScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+MyScreenGui.Name = "MoveableUI"
+MyScreenGui.ResetOnSpawn = false
+MyScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 MainPanel.Name = "MainPanel"
-MainPanel.Parent = CustomScreenGui
+MainPanel.Parent = MyScreenGui
 MainPanel.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
 MainPanel.BorderSizePixel = 0
 MainPanel.Size = UDim2.new(0, 300, 0, 300) -- Square size
@@ -128,45 +128,45 @@ WatermarkText.TextColor3 = Color3.new(1, 1, 1)
 WatermarkText.TextSize = 18
 
 -- UI Toggle Functionality
-local uiVisibility = true
+local isUIVisible = true
 game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
     if input.KeyCode == Enum.KeyCode.Tab then
-        uiVisibility = not uiVisibility
-        MainPanel.Visible = uiVisibility
+        isUIVisible = not isUIVisible
+        MainPanel.Visible = isUIVisible
     end
 end)
 
 -- Variables for Coin Farming
-local currentPlayer = game.Players.LocalPlayer
-local playerCharacter = currentPlayer.Character or currentPlayer.CharacterAdded:Wait()
-local rootPart = playerCharacter:WaitForChild("HumanoidRootPart")
-local isRunning = false
-local totalCoins = 0
+local localPlayer = game.Players.LocalPlayer
+local playerCharacter = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+local humanoidRootPart = playerCharacter:WaitForChild("HumanoidRootPart")
+local isFarmingRunning = false
+local totalCoinsCollected = 0
 
 -- Update 'Running' State
 spawn(function()
     while wait(0.1) do
-        StatusLabel.Text = "Running: " .. tostring(isRunning)
+        StatusLabel.Text = "Running: " .. tostring(isFarmingRunning)
     end
 end)
 
 -- Toggle Button Functionality
 ToggleButtonUI.MouseButton1Click:Connect(function()
-    isRunning = not isRunning
-    print("Running state toggled to:", isRunning)
+    isFarmingRunning = not isFarmingRunning
+    print("Running state toggled to:", isFarmingRunning)
 end)
 
 -- Teleport to GunDrop Button Functionality
 TeleportBtn.MouseButton1Click:Connect(function()
-    local previousPosition = rootPart.CFrame -- Save the player's current position
+    local previousPosition = humanoidRootPart.CFrame -- Save the player's current position
     local closestGunDrop = nil
     local closestDistance = math.huge
 
     -- Find the nearest GunDrop
     for _, obj in pairs(workspace:GetDescendants()) do
         if obj.Name == "GunDrop" and obj:IsA("BasePart") then
-            local dist = (obj.Position - rootPart.Position).Magnitude
+            local dist = (obj.Position - humanoidRootPart.Position).Magnitude
             if dist < closestDistance then
                 closestDistance = dist
                 closestGunDrop = obj
@@ -175,16 +175,16 @@ TeleportBtn.MouseButton1Click:Connect(function()
     end
 
     if closestGunDrop then
-        rootPart.CFrame = closestGunDrop.CFrame + Vector3.new(0, 3, 0) -- Teleport to the GunDrop
+        humanoidRootPart.CFrame = closestGunDrop.CFrame + Vector3.new(0, 3, 0) -- Teleport to the GunDrop
         task.wait(0.1) -- Shorter delay
-        rootPart.CFrame = previousPosition -- Teleport back to the old position
+        humanoidRootPart.CFrame = previousPosition -- Teleport back to the old position
     else
         print("GunDrop not found!")
     end
 end)
 
 -- Function to find all coins
-local function collectAllCoins()
+local function findAllCoins()
     local coinsList = {}
     for _, obj in pairs(workspace:GetDescendants()) do
         if obj.Name == "Coin_Server" and obj:IsA("BasePart") then
@@ -196,18 +196,18 @@ end
 
 -- Function to teleport to a coin
 local function moveToCoin(coin)
-    if not rootPart or not coin then return end
-    rootPart.CFrame = coin.CFrame + Vector3.new(0, 3, 0)
+    if not humanoidRootPart or not coin then return end
+    humanoidRootPart.CFrame = coin.CFrame + Vector3.new(0, 3, 0)
 end
 
 -- Main Farming Loop
 spawn(function()
     while wait(0.1) do
-        if isRunning then
-            local coins = collectAllCoins()
+        if isFarmingRunning then
+            local coins = findAllCoins()
             if #coins > 0 then
                 moveToCoin(coins[math.random(1, #coins)])
-                totalCoins = totalCoins + 1
+                totalCoinsCollected = totalCoinsCollected + 1
             end
         end
     end
