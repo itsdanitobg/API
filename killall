@@ -1,0 +1,57 @@
+-- > Declarations < --
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LP = Players.LocalPlayer
+local maxDistance = 500 -- Maximum range for teleporting behind players
+local stopScript = false -- Flag to stop the script if needed
+
+-- > Functions < --
+
+function TeleportBehindPlayer(player)
+    -- Check if the player has a valid character and HumanoidRootPart
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local target = player.Character.HumanoidRootPart
+        local myHumanoidRootPart = LP.Character.HumanoidRootPart
+        
+        -- Calculate the direction to teleport behind the player
+        local direction = (myHumanoidRootPart.Position - target.Position).unit -- Get the vector pointing behind
+        local newPos = target.Position + direction * 5 -- Move 5 studs behind the player
+
+        -- Teleport the player behind
+        LP.Character.HumanoidRootPart.CFrame = CFrame.new(newPos)
+    end
+end
+
+-- > Main Loop < --
+
+RunService.RenderStepped:connect(function()
+    -- If the stop flag is true, exit the loop and stop the script
+    if stopScript then
+        return
+    end
+    
+    -- Loop through all players
+    for _, player in pairs(Players:GetChildren()) do
+        -- Skip if the player is the LocalPlayer or if the player is dead
+        if player ~= LP and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local distance = (LP.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+            
+            -- If the player is within range (500 meters), teleport behind them
+            if distance <= maxDistance then
+                TeleportBehindPlayer(player)
+            end
+        end
+    end
+end)
+
+-- > Stop the Script < --
+
+-- Example condition to stop the script (e.g., when a player leaves the game)
+Players.PlayerRemoving:Connect(function(player)
+    -- Stop if the player being removed is the murderer or any other condition you want
+    if player == LP then
+        stopScript = true
+    end
+end)
