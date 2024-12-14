@@ -5,6 +5,9 @@ local player = Players.LocalPlayer
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Joystickplays/psychic-octo-invention/main/yarhm.lua", false))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/ctrl-click-tp-nameesp"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/void-protection"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Neon-Fox/roblox-scripts/main/VynixuMM2"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/edgeiy/infiniteyield/master/source"))()
+
 -- Display notification (run only once)
 StarterGui:SetCore("SendNotification", {
     Title = "Welcome, " .. playerName .. "!",
