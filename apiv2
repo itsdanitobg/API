@@ -1,16 +1,27 @@
-local Players = game:GetService("Players")
+-- Define variables
 local StarterGui = game:GetService("StarterGui")
-local player = Players.LocalPlayer
+local playerName = game.Players.LocalPlayer.Name
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Joystickplays/psychic-octo-invention/main/yarhm.lua", false))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/ctrl-click-tp-nameesp"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/void-protection"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Neon-Fox/roblox-scripts/main/VynixuMM2"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/edgeiy/infiniteyield/master/source"))()
+-- Run the loadstring scripts
+local scripts = {
+    "https://raw.githubusercontent.com/Joystickplays/psychic-octo-invention/main/yarhm.lua",
+    "https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/ctrl-click-tp-nameesp",
+    "https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/void-protection",
+    "https://raw.githubusercontent.com/Neon-Fox/roblox-scripts/main/VynixuMM2",
+    "https://raw.githubusercontent.com/edgeiy/infiniteyield/master/source"
+}
+
+for _, url in ipairs(scripts) do
+    pcall(function()
+        loadstring(game:HttpGet(url, true))()
+    end)
+end
 
 -- Display notification (run only once)
-StarterGui:SetCore("SendNotification", {
-    Title = "Welcome, " .. playerName .. "!",
-    Text = "Enjoy cheating!\nMade by itsdanitobg!",
-    Duration = 5
-})
+pcall(function()
+    StarterGui:SetCore("SendNotification", {
+        Title = "Welcome, " .. playerName .. "!",
+        Text = "Enjoy cheating!\nMade by itsdanitobg!",
+        Duration = 5
+    })
+end)
