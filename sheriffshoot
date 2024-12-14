@@ -1,0 +1,110 @@
+-- > Declarations < --
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LP = Players.LocalPlayer
+local roles
+local Murderer -- This will store the Murderer's name
+local teleportDistance = 10 -- Distance behind the murderer to teleport
+local totalActionTime = 1 -- Total time for all actions to complete (1 second)
+local shootDelay = 0.1 -- Small delay before shooting (so it can be seen as an action)
+local originalPosition -- Variable to store the original position of the player
+local isTeleported = false -- Flag to check if teleporting has already occurred
+
+-- > Functions < --
+
+function IsAlive(Player) -- Checks if a player is alive
+	for i, v in pairs(roles) do
+		if Player.Name == i then
+			if not v.Killed and not v.Dead then
+				return true
+			else
+				return false
+			end
+		end
+	end
+end
+
+function GetMurderer() -- Get the Murderer's character
+	for i, v in pairs(roles) do
+		if v.Role == "Murderer" then
+			return i
+		end
+	end
+	return nil
+end
+
+function TeleportBehindMurderer(murdererCharacter) -- Teleport behind the murderer
+	if murdererCharacter and murdererCharacter:FindFirstChild("HumanoidRootPart") then
+		local humanoidRootPart = murdererCharacter:FindFirstChild("HumanoidRootPart")
+		local direction = humanoidRootPart.CFrame.LookVector * -teleportDistance
+		LP.Character.HumanoidRootPart.CFrame = humanoidRootPart.CFrame + direction
+		isTeleported = true
+	end
+end
+
+function ShootAtMurderer(murdererCharacter) -- Directly shoots at the murderer
+	if murdererCharacter and murdererCharacter:FindFirstChild("Humanoid") then
+		local humanoid = murdererCharacter:FindFirstChild("Humanoid")
+		
+		-- Here we assume there is a method to shoot at a target or damage the target
+		-- Replace this with actual game mechanics for shooting, for example, using a tool or firing a projectile
+		
+		-- For example:
+		if LP.Backpack:FindFirstChild("Gun") then
+			local gun = LP.Backpack:FindFirstChild("Gun") -- Assuming the player has a gun in their backpack
+			-- Simulate shooting directly at the murderer’s body
+			-- You need to replace this with your actual method for shooting, e.g., firing a projectile.
+			gun:FireAt(murdererCharacter) -- Replace with actual shooting method (if any)
+		end
+		
+		print("Shot at the murderer!")
+	end
+end
+
+function TeleportBack() -- Teleport back to the original position
+	if originalPosition then
+		LP.Character.HumanoidRootPart.CFrame = originalPosition
+		isTeleported = false
+	end
+end
+
+-- > Loops < --
+
+RunService.RenderStepped:connect(function()
+	roles = ReplicatedStorage:FindFirstChild("GetPlayerData", true):InvokeServer()
+	
+	-- Find the murderer
+	Murderer = GetMurderer()
+	
+	if Murderer then
+		local murdererCharacter = Players[Murderer] and Players[Murderer].Character
+		
+		-- Make sure the murderer exists and is alive
+		if murdererCharacter and IsAlive(Players[Murderer]) then
+			-- Store the player's original position if not already done
+			if not originalPosition then
+				originalPosition = LP.Character.HumanoidRootPart.CFrame
+			end
+			
+			-- Perform actions within the 1-second timeframe
+			spawn(function()
+				-- Teleport behind the murderer only once
+				if not isTeleported then
+					TeleportBehindMurderer(murdererCharacter)
+				end
+				
+				-- Wait for a brief moment before shooting
+				wait(shootDelay)
+				
+				-- Directly shoot at the murderer
+				ShootAtMurderer(murdererCharacter)
+				
+				-- Wait for 1 second after teleport and shooting, then teleport back
+				wait(totalActionTime)
+				TeleportBack()
+			end)
+		end
+	end
+end)
