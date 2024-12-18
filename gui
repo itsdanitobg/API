@@ -144,13 +144,6 @@ local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 local running = false
 local collectedCoins = 0
 
--- Update 'Running' State
-spawn(function()
-    while wait(0.1) do
-        RunningLabel.Text = "Running: " .. tostring(running)
-    end
-end)
-
 -- Toggle Button Functionality
 ToggleButton.MouseButton1Click:Connect(function()
     running = not running
@@ -200,21 +193,6 @@ local function teleportToCoin(coin)
     humanoidRootPart.CFrame = coin.CFrame + Vector3.new(0, 3, 0)
 end
 
--- Main Farming Loop
-spawn(function()
-    while wait(0.05) do -- Faster loop
-        if running then
-            local coins = getAllCoins()
-            if #coins > 0 then
-                local targetCoin = coins[1] -- Prioritize the first coin
-                teleportToCoin(targetCoin)
-                if targetCoin.Parent then
-                    collectedCoins = collectedCoins + 1
-                end
-            end
-        end
-    end
-end)
 
 -- KillAll Button Functionality
 KillAllButton.MouseButton1Click:Connect(function()
