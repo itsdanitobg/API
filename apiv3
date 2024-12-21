@@ -25,7 +25,7 @@ do
     if not success then
         warn("Failed to load external script: ", err)
     else
-        local secondScriptUrl = "https://raw.githubusercontent.com/itsdanitobg/API/refs/heads/main/void-protection"
+        local secondScriptUrl = "https://raw.githubusercontent.com/ThatSick/HighlightMM2/main/Lite"
         local success2, err2 = pcall(function()
             loadstring(game:HttpGet(secondScriptUrl))()
         end)
